@@ -43,6 +43,11 @@ try:
 except ImportError:
     import cElementTree as ET
 
+
+import feedparser
+import time
+from datetime import datetime, timedelta
+
 parser = optparse.OptionParser()
 parser.add_option("--debug", action="store_true", help="debug output")
 parser.add_option("--verbose", action="store_true", help="verbose")
@@ -101,10 +106,6 @@ for p in root.findall('package'):
 
 prjs = devel_packages.keys()
 prjs.append(mainprj)
-
-import feedparser, time
-from datetime import datetime
-from datetime import timedelta
 
 requests_to_check = set()
 authors={}
@@ -169,6 +170,7 @@ if options.users:
     f = open(options.users, 'wb')
     pickle.dump(users, f)
 
-authors = sorted(authors.items(), key=lambda x: x[1])
-for author in authors:
-  print users[author[0]], author[1]
+authors = sorted(authors.items(), key=lambda x: x[1], reverse=True)
+with  open('last-week.csv', 'w') as f:
+    for author in authors:
+        print >>f, (u'%s, %s'%(users[author[0]], author[1])).encode('utf-8')
